@@ -1,0 +1,25 @@
+%% 
+void loop() 
+{
+  initial_time=millis(); %αρχικοποιηση χρόνου
+  final_time=millis();
+  counter=0;
+  counter_fails=0;
+  while(abs(final_time-initial_time)<=duration_of_calculation)
+  {
+    int sensorVal = random(1000); // measure something
+    //int sensorVal = analogRead(sensorPin); // measure something απο πιν
+    //Serial.print("My measurement is: ");
+   // Serial.println(sensorVal); // and show it on Serial
+
+  // the following variables are used in order to transform my integer measured value into a uint8_t variable, which is proper for my radio
+    char data_read[RF22_ROUTER_MAX_MESSAGE_LEN];
+    uint8_t data_send[RF22_ROUTER_MAX_MESSAGE_LEN];
+    memset(data_read, '\0', RF22_ROUTER_MAX_MESSAGE_LEN);
+    memset(data_send, '\0', RF22_ROUTER_MAX_MESSAGE_LEN);    
+    sprintf(data_read, "%d", sensorVal); // I'm copying the measurement sensorVal into variable data_read
+    data_read[RF22_ROUTER_MAX_MESSAGE_LEN - 1] = '\0'; 
+    memcpy(data_send, data_read, RF22_ROUTER_MAX_MESSAGE_LEN); // now I'm copying data_read to data_send
+    number_of_bytes=sizeof(data_send); // I'm counting the number of bytes of my message
+    //Serial.print("Number of Bytes= ");
+    //Serial.println(number_of_bytes);  // and show the result on my monitor
