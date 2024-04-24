@@ -7,7 +7,7 @@ int xCoordinates[maxDataPoints]; // Array to store X-axis coordinates
 int currentIndex = 0; // Index to keep track of the current position in the array
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600);//ok
 
   Wire.begin();             //setup I2C bus
   Wire.setClock(400000);    // I2C fast mode, 400kHz
