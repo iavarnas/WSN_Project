@@ -1,0 +1,86 @@
+#include <SparkFun_MAG3110.h>
+#include <RF22.h>
+#include <RF22Router.h>
+#define MY_ADDRESS 1
+#define DESTINATION_ADDRESS 2
+RF22Router rf22(MY_ADDRESS);
+
+long randNumber;
+boolean successful_packet = false;
+int max_delay=3000;
+
+MAG3110 mag = MAG3110(); //Instantiate MAG3110
+
+void setup() {
+  Serial.begin(9600);
+
+  Wire.begin();             //setup I2C bus
+  Wire.setClock(400);    // I2C fast mode, 400kHz
+
+  mag.initialize(); //Initializes the mag sensor
+  mag.start();      //Puts the sensor in active mode
+  Serial.begin(9600);
+  if (!rf22.init())
+    Serial.println("RF22 init failed");
+  // Defaults after init are 434.0MHz, 0.05MHz AFC pull-in, modulation FSK_Rb2_4Fd36
+  if (!rf22.setFrequency(431.0))
+    Serial.println("setFrequency Fail");
+  rf22.setTxPower(RF22_TXPOW_20DBM);
+  //1,2,5,8,11,14,17,20 DBM
+  //rf22.setModemConfig(RF22::OOK_Rb40Bw335  );
+  rf22.setModemConfig(RF22::GFSK_Rb125Fd125);
+  //modulation
+
+  // Manually define the routes for this network
+  rf22.addRouteTo(DESTINATION_ADDRESS, DESTINATION_ADDRESS);
+  //sensorVal = analogRead(A0);
+  //randomSeed(sensorVal);// (μία μόνο φορά μέσα στην setup)
+}
+
+void loop() {
+
+  int x, y, z;
+  //Only read data when it's ready
+  if(mag.dataReady()) {
+    //Read the data
+    mag.readMag(&x, &y, &z);
+
+    Serial.print("X: ");
+    Serial.println(x);
+    //Serial.print(", Y: ");
+    //Serial.print(y);
+    //Serial.print(", Z: ");
+    //Serial.println(z);
+
+    Serial.println("--------");
+    delay(500);
+  }
+  Serial.print("sensor Value: ");
+  Serial.println(x);
+  
+  char data_read[RF22_ROUTER_MAX_MESSAGE_LEN];
+  uint8_t data_send[RF22_ROUTER_MAX_MESSAGE_LEN];
+  memset(data_read, '\0', RF22_ROUTER_MAX_MESSAGE_LEN);
+  memset(data_send, '\0', RF22_ROUTER_MAX_MESSAGE_LEN);
+  sprintf(data_read, "%d", x);
+  data_read[RF22_ROUTER_MAX_MESSAGE_LEN - 1] = '\0';
+  memcpy(data_send, data_read, RF22_ROUTER_MAX_MESSAGE_LEN);
+
+  successful_packet = false;
+  while (!successful_packet)
+  {
+
+    if (rf22.sendtoWait(data_send, sizeof(data_send), DESTINATION_ADDRESS) != RF22_ROUTER_ERROR_NONE)
+    {
+      Serial.println("sendtoWait failed");
+      randNumber=random(200,max_delay);
+      Serial.println(randNumber);
+      delay(randNumber);
+    }
+    else
+    {
+      successful_packet = true;
+     Serial.println("sendtoWait Succesful");
+    }
+  }
+}
