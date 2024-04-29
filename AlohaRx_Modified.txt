@@ -47,7 +47,7 @@ void loop() {
     Serial.print("got request from : ");
     Serial.println(from, DEC);
     received_value = atoi((char*)incoming);
-    storeCoordinate(received_value);
+    //storeCoordinate(received_value);
     Serial.print("X-Coordinate: ");
     Serial.println(received_value);
  //   delay(1000);
@@ -59,21 +59,21 @@ void loop() {
     }
 }
 
-void storeCoordinate(int x){
+/*void storeCoordinate(int x){
   // Store the X-axis coordinate in the array if there's still space
   if (currentIndex < maxDataPoints) {
     xCoordinates[currentIndex] = x;
     currentIndex++;
   }
-}
+}*/
 void printCoordinates() {
   Serial.println("Stored X-axis coordinates:");
   for (int i = 0; i < maxDataPoints; i++) {
     Serial.print("X");
     Serial.print(i);
     Serial.print(": ");
-    Serial.print(xCoordinates[i]   );
-    Serial.println(" ");
+    //Serial.print(xCoordinates[i]   );
+   // Serial.println(" ");
   }
   Serial.println("----------------------");
 }
