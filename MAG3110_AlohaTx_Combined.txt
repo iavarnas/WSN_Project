@@ -46,7 +46,7 @@ void loop() {
     mag.readMag(&x, &y, &z);
 
     Serial.print("X: ");
-    Serial.println(x);
+    Serial.println(abs(x));
     //Serial.print(", Y: ");
     //Serial.print(y);
     //Serial.print(", Z: ");
@@ -55,14 +55,14 @@ void loop() {
     Serial.println("--------");
     delay(500);
   }
-  Serial.print("sensor Value: ");
-  Serial.println(x);
+  //Serial.print("sensor Value: ");
+  //Serial.println(x);
   
   char data_read[RF22_ROUTER_MAX_MESSAGE_LEN];
   uint8_t data_send[RF22_ROUTER_MAX_MESSAGE_LEN];
   memset(data_read, '\0', RF22_ROUTER_MAX_MESSAGE_LEN);
   memset(data_send, '\0', RF22_ROUTER_MAX_MESSAGE_LEN);
-  sprintf(data_read, "%d", x);
+  sprintf(data_read, "%d", abs(x));
   data_read[RF22_ROUTER_MAX_MESSAGE_LEN - 1] = '\0';
   memcpy(data_send, data_read, RF22_ROUTER_MAX_MESSAGE_LEN);
 
