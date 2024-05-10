@@ -16,4 +16,8 @@ MAG_Storage:
 Κώδικες:
        MAG3110_AlohaTx_Combined:   στέλνουμε με επιτυχία την απόλυτη τιμή του άξονα Χ
        Test_Fourier.py:            γράφημα fourier γα ένα τυχαιό σήμα
+**10/05/2023**
+Κώδικες:
+	PitchControl.py //κώδικας Python για το GUI
+ 
              
