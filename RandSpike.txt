@@ -1,0 +1,15 @@
+import random
+
+def generate_numbers(num_to_generate):
+    numbers_sent = 0
+    while numbers_sent < num_to_generate:
+        if numbers_sent % 10 == 0:
+            yield 8000
+        else:
+            yield random.randint(0, 2000)
+        numbers_sent += 1
+
+# Example usage:
+num_to_generate = 100
+generated_numbers = list(generate_numbers(num_to_generate))
+print(generated_numbers)
