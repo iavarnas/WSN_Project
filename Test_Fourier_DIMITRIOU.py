@@ -83,8 +83,9 @@ while (1==1):
 
             dominant_frequency_index = np.argmax(X_mag_plot)  # Find the index of the maximum magnitude
             dominant_frequency = f_plot[dominant_frequency_index]  # Get the corresponding frequency
+            rpm = 60 * dominant_frequency
             print("dominant frequency=", dominant_frequency)
-
+            print("RPM", rpm)
 
 
             #plots
