@@ -19,5 +19,10 @@ MAG_Storage:
 **10/05/2023**
 Κώδικες:
 	PitchControl.py //κώδικας Python για το GUI
- 
+**15/05/2023**
+Κώδικες:
+       fast_fourier.py//κώδικας serial-Python απο Τσατσα,Δημητριού κωδικάς για Fourier και real time plots(frequency spectrum,timedomain)
+       και print dominant_frequency , RPM
+
+       NEXT---->GUII 
              
