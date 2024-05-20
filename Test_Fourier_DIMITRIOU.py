@@ -84,10 +84,23 @@ while (1==1):
             dominant_frequency_index = np.argmax(X_mag_plot)  # Find the index of the maximum magnitude
             dominant_frequency = f_plot[dominant_frequency_index]  # Get the corresponding frequency
             rpm = 60 * dominant_frequency
-            print("dominant frequency=", dominant_frequency)
+            
+            # Check if RPM exceeds 500
+            if rpm >= 500:
+                print(f"Alarm! RPM is too high: {rpm}")
+
+            print("dominant frequency =", dominant_frequency)
             print("RPM", rpm)
 
+              #from tkinter import messagebox
+               ## Inside the RPM check
+               #if rpm >= 500:
+                  # messagebox.showwarning("Alarm", f"RPM is too high: {rpm}")
 
+            
+            
+            
+            
             #plots
             fig, ((ax1), (ax4)) = plt.subplots(2, 1)
             ax1.plot(Time_Sequence_For_FFT, X_accel_interp, '.-')
