@@ -44,8 +44,8 @@ void loop() {
   {
     buf[RF22_ROUTER_MAX_MESSAGE_LEN - 1] = '\0';
     memcpy(incoming, buf, RF22_ROUTER_MAX_MESSAGE_LEN);
-    Serial.print("got request from : ");
-    Serial.println(from, DEC);
+    //Serial.print("got request from : ");
+    //Serial.println(from, DEC);
     received_value = atoi((char*)incoming);
     //storeCoordinate(received_value);
     Serial.print("X-Coordinate:");
