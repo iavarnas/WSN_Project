@@ -1,0 +1,23 @@
+# Create and display the figure in AngularVelocityFrame
+    figureRPM = Figure(figsize=(5, 4), dpi=100)
+    ax = figureRPM.add_subplot(111)
+    x_data, y_data = [], []
+
+    def update_plot():
+        x_data.append(time.time() % 150)  # Ensure x_data is within 0 to 150 for demo
+        y_data.append(random.randint(0, 150))  # Ensure y_data is within 0 to 150
+        if len(x_data) > 50:  # Limit to the latest 50 data points
+            x_data.pop(0)
+            y_data.pop(0)
+        ax.clear()
+        ax.plot(x_data, y_data)
+        ax.set_xlim(0, 150)  # Set x-axis range
+        ax.set_ylim(0, 150)  # Set y-axis range
+        canvas.draw()
+        root.after(1000, update_plot)  # Update every second
+
+    canvas = FigureCanvasTkAgg(figureRPM, master=AngularVelocityFrame)
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=0, column=0, sticky='NSEW')
+
+    update_plot()  # Start the update loop
