@@ -1,0 +1,76 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import serial
+
+FFT_time_window = 2000.0
+Current_time = 0.0
+
+X_accel = np.array([])
+Time_accel = np.array([])
+RPM_values = np.array([])  # Array to store RPM values
+RPM_times = np.array([])   # Array to store times corresponding to RPM values
+Start_FFT_time = Current_time
+
+arduino_Serial_Data = serial.Serial('COM9', 9600)  # Modify with your actual COM port
+
+j = 0
+while True:
+    if (arduino_Serial_Data.inWaiting()> 0):
+        j += 1
+        myData = str(arduino_Serial_Data.readline())#decode('utf-8').strip()
+        x_start = int(myData.find("X-Coordinate:"))
+        t_start = int(myData.find(",Time ="))
+        end =int(myData.find("."))
+
+        x_accel = float(myData[x_start+len("X-Coordinate:"):t_start])
+        Current_time = float(myData[t_start + len(",Time ="):end])
+
+        if j == 1:
+            Start_FFT_time = Current_time
+
+        X_accel = np.append(X_accel, [x_accel])
+        Time_accel = np.append(Time_accel, [Current_time])
+
+        if (Current_time - Start_FFT_time) > FFT_time_window:
+            N_FFT = Time_accel.size
+            Average_time_difference = (Current_time - Start_FFT_time) / float(Time_accel.size - 1)
+            Fs = 1000 / Average_time_difference
+            Df = Fs / float(N_FFT)
+            Time_Sequence_For_FFT = np.linspace(Start_FFT_time, Current_time, N_FFT)
+            f = np.linspace(0, (N_FFT - 1) * Df, int(N_FFT))
+
+            X_accel_interp = np.interp(Time_Sequence_For_FFT, Time_accel, X_accel)
+            X_FFT = np.fft.fft(X_accel_interp)
+            X_mag = np.abs(X_FFT) / N_FFT
+
+            f_plot = f[1:int(N_FFT / 2 + 1)]
+            X_mag_plot = 2 * X_mag[1:int(N_FFT / 2 + 1)]
+
+            dominant_frequency_index = np.argmax(X_mag_plot)
+            dominant_frequency = f_plot[dominant_frequency_index]
+            rpm = 60 * dominant_frequency
+
+            RPM_values = np.append(RPM_values, rpm)
+            RPM_times = np.append(RPM_times, Current_time)
+
+            if rpm >= 500:
+                print(f"Alarm! RPM is too high: {rpm}")
+
+            print("dominant frequency =", dominant_frequency)
+            print("RPM =", rpm)
+
+            fig, (ax3) = plt.subplots(1, 1, figsize=(10, 8))
+
+
+            ax3.plot(RPM_times, RPM_values, '.-')
+            ax3.set_xlabel("Time (ms)")
+            ax3.set_ylabel("RPM")
+            ax3.grid()
+
+            plt.tight_layout()
+            plt.show()
+
+            X_accel = np.delete(X_accel, 0)
+            Time_accel = np.delete(Time_accel, 0)
+            Start_FFT_time = Current_time
+            j = 0
