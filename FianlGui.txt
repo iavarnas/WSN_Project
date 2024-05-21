@@ -1,0 +1,299 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+from PIL import Image, ImageTk, ImageSequence
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import time
+import threading
+from datetime import datetime
+import numpy as np
+import serial
+# Function to handle login
+def login():
+    username = username_entry.get()
+    password = password_entry.get()
+
+    # For demonstration, we'll just show a message box
+    # In a real application, you'd validate the username and password here
+    if username == "admin" and password == "1234":
+        messagebox.showinfo("Login Successful", f"Welcome, {username}!")
+        login_window.destroy()
+        create_main_window()
+    else:
+        messagebox.showerror("Login Failed", "Invalid username or password")
+
+def create_main_window():
+    # Create the main window
+    root = tk.Tk()
+    root.title("Pitch Control")
+
+    # Ensure the window resizes properly with the content
+    root.rowconfigure(0, weight=1)
+    root.columnconfigure(0, weight=1)
+
+    # -------------------- STYLING AND IMAGES -------------------- #
+    s = ttk.Style()
+    s.configure('MainFrame.TFrame', background="white")
+    s.configure('UserFrame.TFrame', background="white", relief="raised")
+    s.configure("AngularVelocityFrame.TFrame", background="white")
+    s.configure("AnimationFrame.TFrame", background="white")
+    s.configure("SerialMonitorFrame.TFrame", background="white")
+    s.configure("FunctionsFrame.TFrame", background="#387ADF")
+    s.configure("UserFrameLabel.TLabel",
+                background="white",
+                font=('Montserrat', 11),
+                foreground='#387ADF',
+                padding=(5, 5, 5, 5),
+                width=18
+                )
+    s.configure("DateAndTimeLabel.TLabel",
+                background="white",
+                font=('Montserrat', 11),
+                foreground='#387ADF',
+                padding=(5, 5, 5, 5),
+                width=18
+                )
+
+    # region Images
+    LogoImageObject = Image.open("images/logo_image.png").resize((220, 220))
+    LogoImage = ImageTk.PhotoImage(LogoImageObject)
+
+    ParametersImageObject = Image.open("images/counters.png").resize((1000, 254))
+    ParametersImage = ImageTk.PhotoImage(ParametersImageObject)
+
+    # -------------------- WIDGETS & FRAMES CONFIGURATION -------------------- #
+
+    # The Screen Pixel Quality (width x height) = 1460 x 914
+    MainFrame = ttk.Frame(root, width=1460, height=914, style='MainFrame.TFrame')
+    MainFrame.grid(sticky="NSEW")
+
+    UserFrame = ttk.Frame(MainFrame, width=250, height=914, style='UserFrame.TFrame')
+    UserFrame.grid(row=0, column=0, rowspan=2, sticky='NSEW')
+
+    AngularVelocityFrame = ttk.Frame(MainFrame, width=505, height=330, style='AngularVelocityFrame.TFrame')
+    AngularVelocityFrame.grid(row=0, column=1, sticky='NSEW')
+
+    AnimationFrame = ttk.Frame(MainFrame, width=505, height=330, style='AnimationFrame.TFrame')
+    AnimationFrame.grid(row=0, column=2, sticky='NSEW')
+
+    SerialMonitorFrame = ttk.Frame(MainFrame, width=1010, height=254, style='SerialMonitorFrame.TFrame')
+    SerialMonitorFrame.grid(row=1, column=1, columnspan=2, sticky='NSEW')
+
+    FunctionsFrame = ttk.Frame(MainFrame, width=200, height=914, style='FunctionsFrame.TFrame')
+    FunctionsFrame.grid(row=0, column=3, rowspan=2, sticky='NSEW')
+
+    # UserFrame Section
+    LogoLabel = ttk.Label(UserFrame, image=LogoImage, background="white")
+    LogoLabel.grid(row=0, column=0, sticky='N')
+    LogoLabel.configure(anchor="center")
+
+    ParameterLabel = ttk.Label(SerialMonitorFrame, image=ParametersImage, background="white")
+    ParameterLabel.grid(row=2, column=0)
+    ParameterLabel.configure(text="\n\n\n\n", anchor="center")
+
+    # UserFrameLabel
+    UserFrameLabel = ttk.Label(UserFrame, text=
+                               "\n\n\n\n\n\n"
+                               "Name: Admin\n"
+                               "Engineer's ID: A123456\n"
+                               "Occupation: Engineer\n"
+                               "Turbine Unit: X257\n",
+                               style="UserFrameLabel.TLabel"
+                               )
+    UserFrameLabel.grid(row=1, column=0, sticky='SWE')
+    UserFrameLabel.configure(
+        anchor="center",
+        font=("Montserrat", 13)
+    )
+    # DateAndTimeLabel
+    DateAndTimeLabel = ttk.Label(UserFrame, text=
+                                 "\n\n\n\n\n\n\n\n\n\n\n\n"
+                                 "Date: 21/04/2024\n"
+                                 "Time: 15:40 p.m.\n"
+                                 "Region: Thessaloniki \n",
+                                 style="DateAndTimeLabel.TLabel"
+                                 )
+    DateAndTimeLabel.grid(row=2, column=0, sticky='SWE')
+    DateAndTimeLabel.configure(
+        anchor="center",
+        font=("Montserrat", 13)
+    )
+
+    # Buttons Configuration
+    # Add buttons to FunctionsFrame
+    btn1 = ttk.Button(FunctionsFrame, text="Sign out")
+    btn2 = ttk.Button(FunctionsFrame, text="Weather")
+    btn3 = ttk.Button(FunctionsFrame, text="Language")
+    btn4 = ttk.Button(FunctionsFrame, text=" . . . ")
+
+    btn1.grid(row=0, column=0, padx=20, pady=10, sticky="EW")
+    btn2.grid(row=1, column=0, padx=20, pady=10, sticky="EW")
+    btn3.grid(row=2, column=0, padx=20, pady=10, sticky="EW")
+    btn4.grid(row=3, column=0, padx=20, pady=10, sticky="EW")
+
+    # -------------------- GRID CONFIGURATION -------------------- #
+    # Configure rows and columns for MainFrame
+    MainFrame.rowconfigure(0, weight=1)
+    MainFrame.rowconfigure(1, weight=1)
+    MainFrame.columnconfigure(0, weight=1)
+    MainFrame.columnconfigure(1, weight=1)
+    MainFrame.columnconfigure(2, weight=1)
+    MainFrame.columnconfigure(3, weight=1)
+
+    # Ensure the MainFrame fills the root window
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_columnconfigure(0, weight=1)
+
+    # RPM Plot
+    FFT_time_window = 2000.0
+    Current_time = 0.0
+
+    X_accel = np.array([])
+    Time_accel = np.array([])
+    RPM_values = np.array([])  # Array to store RPM values
+    RPM_times = np.array([])  # Array to store times corresponding to RPM values
+    Start_FFT_time = Current_time
+
+    arduino_Serial_Data = serial.Serial('COM9', 9600)  # Modify with your actual COM port
+
+    j = 0
+    while True:
+        if (arduino_Serial_Data.inWaiting() > 0):
+            j += 1
+            myData = str(arduino_Serial_Data.readline())  # decode('utf-8').strip()
+            x_start = int(myData.find("X-Coordinate:"))
+            t_start = int(myData.find(",Time ="))
+            end = int(myData.find("."))
+
+            x_accel = float(myData[x_start + len("X-Coordinate:"):t_start])
+            Current_time = float(myData[t_start + len(",Time ="):end])
+
+            if j == 1:
+                Start_FFT_time = Current_time
+
+            X_accel = np.append(X_accel, [x_accel])
+            Time_accel = np.append(Time_accel, [Current_time])
+
+            if (Current_time - Start_FFT_time) > FFT_time_window:
+                N_FFT = Time_accel.size
+                Average_time_difference = (Current_time - Start_FFT_time) / float(Time_accel.size - 1)
+                Fs = 1000 / Average_time_difference
+                Df = Fs / float(N_FFT)
+                Time_Sequence_For_FFT = np.linspace(Start_FFT_time, Current_time, N_FFT)
+                f = np.linspace(0, (N_FFT - 1) * Df, int(N_FFT))
+
+                X_accel_interp = np.interp(Time_Sequence_For_FFT, Time_accel, X_accel)
+                X_FFT = np.fft.fft(X_accel_interp)
+                X_mag = np.abs(X_FFT) / N_FFT
+
+                f_plot = f[1:int(N_FFT / 2 + 1)]
+                X_mag_plot = 2 * X_mag[1:int(N_FFT / 2 + 1)]
+
+                dominant_frequency_index = np.argmax(X_mag_plot)
+                dominant_frequency = f_plot[dominant_frequency_index]
+                rpm = 60 * dominant_frequency
+
+                RPM_values = np.append(RPM_values, rpm)
+                RPM_times = np.append(RPM_times, Current_time)
+
+                if rpm >= 500:
+                    print(f"Alarm! RPM is too high: {rpm}")
+
+                print("dominant frequency =", dominant_frequency)
+                print("RPM =", rpm)
+
+                fig, (ax3) = plt.subplots(1, 1, figsize=(8, 8))
+
+                ax3.plot(RPM_times, RPM_values, '.-')
+                ax3.set_xlabel("Time (ms)")
+                ax3.set_ylabel("RPM")
+                ax3.grid()
+
+                plt.tight_layout()
+                plt.show()
+
+                X_accel = np.delete(X_accel, 0)
+                Time_accel = np.delete(Time_accel, 0)
+                Start_FFT_time = Current_time
+                j = 0
+
+                # Create Canvas
+                canvas = FigureCanvasTkAgg(fig, master=AngularVelocityFrame)
+                canvas.get_tk_widget().grid(row=0, column=0, sticky="NSEW")
+
+    # root.mainloop()
+    # Load the GIF image
+    gif_image = tk.PhotoImage(file="images/wind_turbine_gif.gif")
+
+    # Create a label to display the GIF image
+    gif_label = ttk.Label(AnimationFrame, image=gif_image)
+    gif_label.grid(row=0, column=2, sticky="NSEW")
+
+    # Create a canvas for the Matplotlib figure
+    canvas.get_tk_widget().grid(row=0, column=2, sticky='NSEW')
+
+    # Function to update the GIF image periodically (for demonstration)
+
+    def update_gif():
+        # Load the GIF image again to simulate dynamic changes
+        updated_gif_image = Image.open("images/wind_turbine_gif.gif")
+        gif_frames = [ImageTk.PhotoImage(frame) for frame in ImageSequence.Iterator(updated_gif_image)]
+
+        # Update the GIF label with the new frames
+        gif_label.config(image=gif_frames[0])
+
+        # Schedule the function to update the next frame after a delay
+        def update_frame(index):
+            gif_label.config(image=gif_frames[index])
+            # Increment the index and wrap around if necessary
+            index = (index + 1) % len(gif_frames)
+            # Call update_frame again after a delay to create animation effect
+            root.after(100, update_frame, index)
+
+        # Start the animation by updating the frames
+        update_frame(0)
+
+    # Call the function to start updating the GIF image
+    update_gif()
+
+    root.mainloop()
+
+
+# Create the login window
+login_window = tk.Tk()
+login_window.title("Login")
+
+# Create a frame for the login form
+login_frame = ttk.Frame(login_window, padding="20")
+login_frame.grid(row=0, column=0, sticky="NSEW")
+
+# Configure the grid
+login_window.columnconfigure(0, weight=1)
+login_window.rowconfigure(0, weight=1)
+login_frame.columnconfigure(0, weight=1)
+login_frame.columnconfigure(1, weight=1)
+
+# Username label and entry
+username_label = ttk.Label(login_frame, text="Username:")
+username_label.grid(row=0, column=0, sticky="W", pady=5)
+username_entry = ttk.Entry(login_frame)
+username_entry.grid(row=0, column=1, sticky="EW", pady=5)
+
+# Password label and entry
+password_label = ttk.Label(login_frame, text="Password:")
+password_label.grid(row=1, column=0, sticky="W", pady=5)
+password_entry = ttk.Entry(login_frame, show="*")
+password_entry.grid(row=1, column=1, sticky="EW", pady=5)
+
+# Login button
+login_button = ttk.Button(login_frame, text="Login", command=login)
+login_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+# Make the login frame fill the window
+login_frame.grid_columnconfigure(0, weight=1)
+login_frame.grid_columnconfigure(1, weight=1)
+
+
+# Run the login window
+login_window.mainloop()
