@@ -1,8 +1,8 @@
 #include <RF22.h>
 #include <RF22Router.h>
 
-#define MY_ADDRESS 2
-#define NODE_ADDRESS_1 1
+#define MY_ADDRESS  6
+#define NODE_ADDRESS_1 17  //12?
 #define NODE_ADDRESS_2 13
 #define NODE_ADDRESS_3 14
 RF22Router rf22(MY_ADDRESS);
@@ -10,7 +10,7 @@ RF22Router rf22(MY_ADDRESS);
 const int maxDataPoints = 50; // Maximum number of data points to store
 int xCoordinates[maxDataPoints]; // Array to store X-axis coordinates
 int currentIndex = 0; // Index to keep track of the current position in the array
-
+int received_value = 0; 
 
 
 void setup() {
@@ -18,7 +18,7 @@ void setup() {
   if (!rf22.init())
     Serial.println("RF22 init failed");
   // Defaults after init are 434.0MHz, 0.05MHz AFC pull-in, modulation FSK_Rb2_4Fd36
-  if (!rf22.setFrequency(431.0))
+  if (!rf22.setFrequency(435.0))
     Serial.println("setFrequency Fail");
   rf22.setTxPower(RF22_TXPOW_20DBM);
   //1,2,5,8,11,14,17,20 DBM
@@ -39,7 +39,7 @@ void loop() {
   memset(incoming, '\0', RF22_ROUTER_MAX_MESSAGE_LEN);
   uint8_t len = sizeof(buf);
   uint8_t from;
-  int received_value = 0; 
+  
   if (rf22.recvfromAck(buf, &len, &from))
   {
     buf[RF22_ROUTER_MAX_MESSAGE_LEN - 1] = '\0';
@@ -48,12 +48,17 @@ void loop() {
     Serial.println(from, DEC);
     received_value = atoi((char*)incoming);
     //storeCoordinate(received_value);
-    Serial.print("X-Coordinate: ");
-    Serial.println(received_value);
- //   delay(1000);
-  }
+    Serial.print("X-Coordinate:");
+    Serial.print(received_value);
+    Serial.print(",Time =");
+    Serial.print(millis());
+    Serial.println(".");
+  
+    delay(500);
+     }
+   }
   // Check if we've reached the maximum number of data points
-    if (currentIndex >= maxDataPoints) {
+  /*  if (currentIndex >= maxDataPoints) {
       printCoordinates(); // Print all gathered coordinates
       currentIndex = 0; // Reset the index
     }
@@ -65,7 +70,7 @@ void loop() {
     xCoordinates[currentIndex] = x;
     currentIndex++;
   }
-}*/
+}
 void printCoordinates() {
   Serial.println("Stored X-axis coordinates:");
   for (int i = 0; i < maxDataPoints; i++) {
@@ -75,6 +80,4 @@ void printCoordinates() {
     //Serial.print(xCoordinates[i]   );
    // Serial.println(" ");
   }
-  Serial.println("----------------------");
-}
-
+  Serial.println("-----------------
