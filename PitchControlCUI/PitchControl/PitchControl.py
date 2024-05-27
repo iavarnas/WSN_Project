@@ -139,8 +139,8 @@ def create_main_window():
                                "Engineer's ID: A123456\n"
                                "Occupation: Engineer\n"
                                "Turbine Unit: X257\n\n"
-                               "Date: 20/04/2024\n"
-                               "Time: 16:00 p.m.\n"
+                               "Date: 21/04/2024\n"
+                               "Time: 15:58 p.m.\n"
                                "Region: Thessaloniki",
                                style = "UserFrameLabel.TLabel"
                                )
@@ -173,7 +173,9 @@ def create_main_window():
     canvas.draw()
     canvas.get_tk_widget().grid(row=0, column=0, sticky='NSEW')
 
-    update_plot()  # Start the update loop
+    # update_plot()  # Start the update loop
+
+
     # GIF Implementation
     # Load the GIF image
     gif_image = tk.PhotoImage(file="images/wind_turbine_gif.gif")
@@ -299,15 +301,15 @@ def create_main_window():
         height=4,
         cursor='hand2',
         border=5,
-        text='Emergency Stop',
+        text='Live Feed',
         font=("Montserrat", 16, "bold")
     )
     button4.grid(row=3, column=0, sticky = "NSEW")
 
     button5 = tk.Button(
         FunctionsFrame,
-        background=colour1,
-        foreground=colour2,
+        background="red",
+        foreground="white",
         activebackground=colour3,
         activeforeground=colour4,
         highlightthickness=2,
@@ -317,7 +319,7 @@ def create_main_window():
         height=4,
         cursor='hand2',
         border=5,
-        text='Live Feed',
+        text='Emergency Stop',
         font=("Montserrat", 16, "bold")
     )
     button5.grid(row=4, column=0, sticky = "NSEW")
